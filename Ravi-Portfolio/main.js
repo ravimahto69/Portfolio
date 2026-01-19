@@ -1,8 +1,13 @@
 const navLinks = document.querySelectorAll('.ul-list li a');
+const navList = document.querySelector('.ul-list');
+const navToggle = document.querySelector('.nav-toggle');
 const sections = document.querySelectorAll('section');
 
 function removeActive() {
-  navLinks.forEach(link => link.parentElement.classList.remove('active'));
+  navLinks.forEach(link => {
+    link.parentElement.classList.remove('active');
+    link.removeAttribute('aria-current');
+  });
 }
 
 navLinks.forEach(link => {
@@ -18,8 +23,23 @@ navLinks.forEach(link => {
 
     removeActive();
     link.parentElement.classList.add('active');
+    link.setAttribute('aria-current', 'page');
+
+    if(navList && navList.classList.contains('open')){
+      navList.classList.remove('open');
+      navToggle?.setAttribute('aria-expanded', 'false');
+    }
   });
 });
+
+if(navToggle && navList){
+  navToggle.setAttribute('aria-expanded', 'false');
+
+  navToggle.addEventListener('click', () => {
+    const isOpen = navList.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+}
 
 window.addEventListener('scroll', () => {
   let scrollPos = window.scrollY + 100;
@@ -28,7 +48,10 @@ window.addEventListener('scroll', () => {
     if (scrollPos >= section.offsetTop && scrollPos < section.offsetTop + section.offsetHeight) {
       removeActive();
       const activeLink = document.querySelector(`.ul-list li a[href="#${section.id}"]`);
-      if (activeLink) activeLink.parentElement.classList.add('active');
+      if (activeLink) {
+        activeLink.parentElement.classList.add('active');
+        activeLink.setAttribute('aria-current', 'page');
+      }
     }
   });
 
@@ -116,32 +139,3 @@ function type() {
 }
 
 document.addEventListener('DOMContentLoaded', type);
-
-document.addEventListener("DOMContentLoaded", () => {
-  const loadingText = document.getElementById("loading-text");
-  const mainIcon = document.querySelector(".main-icon");
-  const subIcons = document.querySelectorAll(".sub-icons i");
-  const designerText = document.getElementById("designer-text");
-  const mainPage = document.getElementById("main-page");
-  const loadingScreen = document.getElementById("loading-screen");
-
-  function showElement(element, delay=0){
-    setTimeout(() => {
-      element.classList.remove("hidden");
-      element.classList.add("fall");
-    }, delay);
-  }
-
-  showElement(loadingText, 0);          
-  showElement(mainIcon, 200);         
-  subIcons.forEach((icon, idx) => {
-    showElement(icon, 1600 + idx*300);  
-  });
-  showElement(designerText, 1800);    
-
-  setTimeout(() => {
-    loadingScreen.style.opacity = '0';
-    setTimeout(() => loadingScreen.style.display='none', 500);
-    mainPage.classList.add("visible");
-  }, 4000);
-});
